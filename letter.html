@@ -114,17 +114,19 @@
   }
 
   @media (max-width: 680px){
+    .stage{ flex-direction: column; }
     .letter-wrap{ flex-direction: column; }
-    .photo-col{ flex-direction:row; flex-wrap:wrap; }
-    .photo-card{ flex: 1 1 45%; }
-    .photo-placeholder{ height: 130px; }
+    .photo-col{ flex-direction:column; }
+    .photo-card{ width: 100%; }
+    .photo-placeholder{ height: 220px; }
     .surprise-link{
       position: static;
       display:block;
       width: fit-content;
-      margin: 26px auto 0;
+      margin: 30px auto 0;
       text-align:center;
       animation: none;
+      order: 3;
     }
   }
 </style>
@@ -133,7 +135,6 @@
 <div class="stage">
   <div class="sparkles" id="sparkles"></div>
   <button class="music-toggle" id="musicToggle" title="music">♪</button>
-  <a class="surprise-link" href="loading.html?next=wish.html">🎁 tap here for a surprise →</a>
 
   <div class="letter-wrap">
     <div class="paper">
@@ -149,6 +150,8 @@
 
     <div class="photo-col" id="photoCol"></div>
   </div>
+
+  <a class="surprise-link" href="loading.html?next=wish.html">🎁 tap here for a surprise →</a>
 </div>
 
 <audio id="bgAudio" loop>
