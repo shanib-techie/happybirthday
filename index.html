@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Birthday Surprise</title>
+<link rel="stylesheet" href="style.css" />
+<script src="config.js"></script>
+<style>
+  html, body{ height:auto; min-height:100%; }
+  .stage{ align-items: center; min-height: 100vh; }
+
+  .layout{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 56px;
+    flex-wrap: wrap;
+    max-width: 900px;
+    width:100%;
+    position:relative;
+    z-index:2;
+  }
+
+  /* ---------- Polaroid ---------- */
+  .polaroid{
+    background: var(--cream);
+    padding: 16px 16px 50px;
+    width: 300px;
+    border-radius: 3px;
+    box-shadow: 0 22px 45px var(--shadow), 0 2px 0 rgba(255,255,255,.4) inset;
+    transform: rotate(-4deg);
+    transition: transform .4s ease;
+  }
+  .polaroid:hover{ transform: rotate(-1deg) scale(1.02); }
+  .polaroid-photo{
+    height: 320px;
+    border-radius: 2px;
+    background: #1c0f0c;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .polaroid-photo img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit: cover;
+    filter: brightness(.72) saturate(1.05);
+  }
+  .polaroid-caption{
+    text-align:center;
+    color: var(--ink);
+    font-family:'Dancing Script', cursive;
+    font-size: 22px;
+    margin-top: 14px;
+    line-height:1.15;
+  }
+  .polaroid-caption small{
+    display:block;
+    font-family:'Poppins',sans-serif;
+    font-size: 11px;
+    letter-spacing:.05em;
+    color:#7a6a55;
+    margin-top:2px;
+  }
+
+  /* ---------- Passcode panel ---------- */
+  .pass-panel{ width: 320px; text-align:center; }
+  .lock-icon{ font-size: 26px; margin-bottom: 10px; opacity:.9; animation: swing 2.6s ease-in-out infinite; transform-origin: top center; }
+  @keyframes swing{ 0%,100%{ transform: rotate(-6deg);} 50%{ transform: rotate(6deg);} }
+  .pass-title{
+    font-size: 13px;
+    letter-spacing: .18em;
+    color: var(--gold-soft);
+    margin-bottom: 22px;
+  }
+  .dots{ display:flex; gap:12px; justify-content:center; margin-bottom: 28px; }
+  .dot{
+    width: 13px; height:13px; border-radius:50%;
+    border: 1.5px solid var(--gold-soft);
+    background: transparent;
+    transition: background .15s ease, transform .15s ease;
+  }
+  .dot.filled{ background: var(--gold-soft); transform: scale(1.15); }
+
+  .keypad{
+    display:grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-auto-rows: 60px;
+    gap: 16px;
+    justify-content:center;
+  }
+  .key{
+    position:relative;
+    width:60px; height:60px;
+    border-radius:50%;
+    background: rgba(246,239,223,0.08);
+    border: 1px solid rgba(207,159,78,0.35);
+    color: var(--cream);
+    font-size: 21px;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    transition: background .18s ease, transform .12s ease, box-shadow .18s ease;
+  }
+  .key:hover{ background: rgba(207,159,78,0.18); }
+  .key:active{ transform: scale(.88); }
+  .key.pressed{
+    background: rgba(207,159,78,0.45);
+    box-shadow: 0 0 0 4px rgba(207,159,78,0.18), 0 0 18px rgba(207,159,78,0.5);
+    animation: keyPop .3s ease;
+  }
+  @keyframes keyPop{ 0%{ transform: scale(1);} 40%{ transform: scale(1.18);} 100%{ transform: scale(1);} }
+  .ripple{
+    position:absolute;
+    border-radius:50%;
+    background: rgba(227,192,127,0.55);
+    transform: scale(0);
+    animation: rippleOut .5s ease-out forwards;
+    pointer-events:none;
+  }
+  @keyframes rippleOut{ to{ transform: scale(2.6); opacity:0; } }
+
+  .error-msg{
+    height: 18px;
+    font-size: 12px;
+    color: #e79a9a;
+    margin-top: 14px;
+    letter-spacing: .03em;
+  }
+
+  .shake{ animation: shake .4s ease; }
+  @keyframes shake{
+    10%,90%{ transform: translateX(-3px); }
+    20%,80%{ transform: translateX(6px); }
+    30%,50%,70%{ transform: translateX(-9px); }
+    40%,60%{ transform: translateX(9px); }
+  }
+
+  .scroll-cue{
+    display:none;
+    text-align:center;
+    font-size: 11px;
+    letter-spacing:.15em;
+    color: var(--gold-soft);
+    margin-top: 18px;
+    animation: bounceCue 1.6s ease-in-out infinite;
+  }
+  @keyframes bounceCue{ 0%,100%{ transform: translateY(0); opacity:.6;} 50%{ transform: translateY(6px); opacity:1;} }
+
+  @media (max-width: 640px){
+    .stage{ align-items:flex-start; padding-top: 60px; padding-bottom: 60px; }
+    .layout{ flex-direction:column; gap: 44px; }
+    .polaroid{ width: min(360px, 88vw); }
+    .polaroid-photo{ height: 340px; }
+    .scroll-cue{ display:block; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="sparkles" id="sparkles"></div>
+
+  <div class="layout fade-in">
+    <div>
+      <div class="polaroid">
+        <div class="polaroid-photo">
+          <img id="polaroidImg" src="" alt="" />
+        </div>
+        <div class="polaroid-caption">Happy Birthday!<small id="polaroidName">Bubo</small></div>
+      </div>
+      <div class="scroll-cue">▾ scroll down for the passcode</div>
+    </div>
+
+    <div class="pass-panel">
+      <div class="lock-icon">🔒</div>
+      <div class="pass-title">ENTER A PASSCODE</div>
+      <div class="dots" id="dots"></div>
+      <div class="keypad" id="keypad">
+        <button class="key" data-key="1">1</button>
+        <button class="key" data-key="2">2</button>
+        <button class="key" data-key="3">3</button>
+        <button class="key" data-key="4">4</button>
+        <button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button>
+        <button class="key" data-key="7">7</button>
+        <button class="key" data-key="8">8</button>
+        <button class="key" data-key="9">9</button>
+        <button class="key" data-key="clear">C</button>
+        <button class="key" data-key="0">0</button>
+        <button class="key" data-key="back">⌫</button>
+      </div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  document.getElementById("polaroidName").textContent = SURPRISE_CONFIG.recipientName;
+  document.getElementById("polaroidImg").src = SURPRISE_CONFIG.photos[0].url;
+
+  const CODE_LEN = SURPRISE_CONFIG.passcode.length;
+  const dotsEl = document.getElementById("dots");
+  for (let i = 0; i < CODE_LEN; i++) {
+    const d = document.createElement("div");
+    d.className = "dot";
+    dotsEl.appendChild(d);
+  }
+  const dots = [...dotsEl.children];
+  const errorMsg = document.getElementById("errorMsg");
+  let entered = "";
+
+  function renderDots(){
+    dots.forEach((d,i) => d.classList.toggle("filled", i < entered.length));
+  }
+
+  function tryUnlock(){
+    if (entered === SURPRISE_CONFIG.passcode) {
+      errorMsg.textContent = "";
+      setTimeout(() => { window.location.href = "loading.html?next=envelope.html"; }, 250);
+    } else {
+      errorMsg.textContent = "Wrong code, try again";
+      dotsEl.classList.add("shake");
+      setTimeout(() => {
+        dotsEl.classList.remove("shake");
+        entered = "";
+        renderDots();
+      }, 420);
+    }
+  }
+
+  function spawnRipple(btn, evt){
+    const ripple = document.createElement("span");
+    ripple.className = "ripple";
+    const rect = btn.getBoundingClientRect();
+    const size = rect.width;
+    ripple.style.width = ripple.style.height = size + "px";
+    const x = (evt.touches ? evt.touches[0].clientX : evt.clientX) - rect.left - size/2;
+    const y = (evt.touches ? evt.touches[0].clientY : evt.clientY) - rect.top - size/2;
+    ripple.style.left = x + "px";
+    ripple.style.top = y + "px";
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 500);
+  }
+
+  document.getElementById("keypad").addEventListener("click", (e) => {
+    const btn = e.target.closest(".key");
+    if (!btn) return;
+    const key = btn.dataset.key;
+
+    spawnRipple(btn, e);
+    btn.classList.remove("pressed");
+    void btn.offsetWidth;
+    btn.classList.add("pressed");
+    setTimeout(() => btn.classList.remove("pressed"), 300);
+
+    if (key === "clear") { entered = ""; errorMsg.textContent=""; renderDots(); return; }
+    if (key === "back") { entered = entered.slice(0, -1); errorMsg.textContent=""; renderDots(); return; }
+
+    if (entered.length < CODE_LEN) {
+      entered += key;
+      renderDots();
+      if (entered.length === CODE_LEN) setTimeout(tryUnlock, 180);
+    }
+  });
+
+  // allow physical keyboard too
+  window.addEventListener("keydown", (e) => {
+    if (/^[0-9]$/.test(e.key) && entered.length < CODE_LEN) {
+      entered += e.key; renderDots();
+      if (entered.length === CODE_LEN) setTimeout(tryUnlock, 180);
+    } else if (e.key === "Backspace") {
+      entered = entered.slice(0,-1); renderDots();
+    }
+  });
+
+  scatterSparkles(document.getElementById("sparkles"), 22);
+</script>
+</body>
+</html>

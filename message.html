@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Birthday</title>
+<link rel="stylesheet" href="style.css" />
+<script src="config.js"></script>
+<style>
+  .scene{
+    min-height:100vh;
+    width:100%;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 50% 15%, rgba(255,214,140,.18), transparent 45%),
+      linear-gradient(180deg, #1c1230 0%, #2c1a2e 35%, #3a2130 65%, #241017 100%);
+  }
+  /* string lights across the top */
+  .lights{ position:absolute; top:26px; left:0; right:0; height: 60px; }
+  .lights svg{ width:100%; height:100%; display:block; }
+  .bulb{ animation: twinkle 2.4s ease-in-out infinite; }
+  @keyframes twinkle{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
+
+  /* silhouette figures on a bench */
+  .silhouette{
+    position:absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(520px, 90vw);
+    opacity: .9;
+  }
+
+  .hero-content{
+    position:relative;
+    z-index: 3;
+    text-align:center;
+    padding: 0 24px;
+    margin-top: -60px;
+    max-width: 520px;
+  }
+  .reveal{
+    opacity: 0;
+    transform: translateY(16px);
+    animation: revealUp .8s ease forwards;
+  }
+  @keyframes revealUp{ to{ opacity:1; transform:none; } }
+
+  .hero-date{
+    letter-spacing:.3em;
+    font-size: 12px;
+    color: var(--gold-soft);
+    margin-bottom: 14px;
+    animation-delay: .1s;
+  }
+  .hero-title{
+    font-family:'Dancing Script', cursive;
+    font-size: clamp(34px, 7vw, 58px);
+    color: #fbeee0;
+    text-shadow: 0 4px 22px rgba(0,0,0,.5);
+    animation-delay: .4s;
+    background: linear-gradient(100deg, #fbeee0 20%, var(--gold-soft) 45%, #fbeee0 70%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: revealUp .8s ease forwards .4s, shimmer 5s linear infinite 1.4s;
+  }
+  @keyframes shimmer{ to{ background-position: -220% 0; } }
+  .hero-sub{
+    max-width: 440px;
+    margin: 20px auto 0;
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: rgba(251,238,224,0.85);
+    animation-delay: .9s;
+  }
+  .hero-sub em{ font-style: normal; color: var(--gold-soft); display:block; margin-bottom: 10px; font-size: 14.5px; }
+
+  .read-btn{
+    margin-top: 30px;
+    display:inline-block;
+    padding: 13px 30px;
+    border: 1px solid rgba(227,192,127,0.65);
+    border-radius: 999px;
+    font-size: 12.5px;
+    letter-spacing: .12em;
+    color: var(--gold-soft);
+    background: rgba(255,255,255,0.04);
+    transition: background .25s ease, transform .2s ease;
+    animation-delay: 1.4s;
+  }
+  .read-btn:hover{ background: rgba(227,192,127,0.15); transform: translateY(-2px); }
+  .read-btn.reveal{ animation-name: revealUp, pulseGlow; animation-duration: .8s, 2.4s; animation-delay: 1.4s, 2.4s; animation-iteration-count: 1, infinite; animation-fill-mode: forwards, none; }
+  @keyframes pulseGlow{ 0%,100%{ box-shadow: 0 0 0 0 rgba(227,192,127,0); } 50%{ box-shadow: 0 0 0 6px rgba(227,192,127,0.12); } }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="lights">
+    <svg viewBox="0 0 800 60" preserveAspectRatio="none">
+      <path d="M0,10 Q200,55 400,12 T800,10" fill="none" stroke="rgba(227,192,127,.35)" stroke-width="1.5"/>
+      <g fill="#f7dfa5">
+        <script>
+          // bulbs drawn via JS below for even spacing
+        </script>
+      </g>
+    </svg>
+  </div>
+
+  <svg class="silhouette" viewBox="0 0 520 220" preserveAspectRatio="xMidYMax meet">
+    <!-- ground -->
+    <ellipse cx="260" cy="215" rx="260" ry="10" fill="rgba(0,0,0,.35)"/>
+    <!-- bench -->
+    <rect x="150" y="150" width="220" height="10" rx="3" fill="#160b12"/>
+    <rect x="160" y="120" width="10" height="40" fill="#160b12"/>
+    <rect x="350" y="120" width="10" height="40" fill="#160b12"/>
+    <!-- figure 1 -->
+    <ellipse cx="205" cy="98" rx="17" ry="19" fill="#160b12"/>
+    <path d="M175,150 C175,110 195,90 205,90 C218,90 238,112 236,150 Z" fill="#160b12"/>
+    <!-- figure 2 -->
+    <ellipse cx="315" cy="94" rx="17" ry="19" fill="#160b12"/>
+    <path d="M283,150 C283,105 300,86 315,86 C330,86 350,108 348,150 Z" fill="#160b12"/>
+    <!-- tree hints -->
+    <ellipse cx="60" cy="70" rx="55" ry="65" fill="rgba(10,4,8,.55)"/>
+    <ellipse cx="470" cy="60" rx="65" ry="75" fill="rgba(10,4,8,.55)"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-date reveal" id="heroDate">01 · 01 · 01</div>
+    <div class="hero-title reveal" id="heroHeadline">Happy Birthday Baby!</div>
+    <div class="hero-sub reveal">
+      <em id="heroSub1">—</em>
+      <span id="heroSub2"></span>
+    </div>
+    <a class="read-btn reveal" href="loading.html?next=letter.html">✉ READ YOUR LETTER</a>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  document.getElementById("heroDate").textContent = SURPRISE_CONFIG.heroDate;
+  document.getElementById("heroHeadline").textContent = SURPRISE_CONFIG.heroHeadline;
+  document.getElementById("heroSub1").textContent = SURPRISE_CONFIG.heroSubline1;
+  document.getElementById("heroSub2").textContent = SURPRISE_CONFIG.heroSubline2;
+
+  // draw evenly spaced twinkling bulbs along the light string
+  const g = document.querySelector(".lights svg g");
+  const positions = [40,110,180,250,320,390,460,530,600,670,740];
+  positions.forEach((x,i) => {
+    const y = 10 + Math.sin(i*0.9) * 10 + 14;
+    const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx", x); c.setAttribute("cy", y); c.setAttribute("r", 4);
+    c.setAttribute("class","bulb");
+    c.style.animationDelay = (i*0.15)+"s";
+    g.appendChild(c);
+  });
+</script>
+</body>
+</html>

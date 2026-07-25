@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Make a Wish</title>
+<link rel="stylesheet" href="style.css" />
+<script src="config.js"></script>
+<style>
+  .wish-stage{ text-align:center; position:relative; z-index:2; max-width: 420px; padding: 0 18px; }
+  .wish-title{
+    font-family:'Dancing Script', cursive;
+    font-size: 32px;
+    color: var(--gold-soft);
+    margin-bottom: 36px;
+    letter-spacing:.02em;
+  }
+  .wish-title::before, .wish-title::after{ content:"✨"; margin: 0 10px; font-size:18px; }
+
+  .cake-scene{ position:relative; height: 240px; display:flex; align-items:flex-end; justify-content:center; margin-bottom: 26px; }
+
+  .num-candle{
+    position:relative;
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size: 40px;
+    color: #f3e6d2;
+    -webkit-text-stroke: 1px #caa968;
+    margin-bottom: -4px;
+  }
+  .num-flame{
+    position:absolute;
+    top:-24px; left:50%; transform:translateX(-50%);
+    width:12px; height:18px; border-radius: 60% 60% 50% 50%;
+    background: radial-gradient(circle at 50% 70%, #fff2c9, #f5a623 55%, #e2600a);
+    filter: drop-shadow(0 0 8px rgba(245,166,35,.85));
+    animation: flick 1s ease-in-out infinite;
+    transform-origin: bottom center;
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  @keyframes flick{ 0%,100%{ transform: translateX(-50%) scaleY(1) rotate(0deg);} 50%{ transform: translateX(-50%) scaleY(.82) rotate(4deg);} }
+  .num-flame.out{ opacity:0; transform: translateX(-50%) scaleY(0); }
+
+  /* ---------- Two-tier cake ---------- */
+  .cake{ position:relative; }
+  .tier{
+    position:relative;
+    border-radius: 8px 8px 4px 4px;
+    box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  }
+  .tier-top{
+    width: 130px; height: 58px;
+    background: linear-gradient(180deg, #f3d7de, #d98a9c);
+    margin: 0 auto;
+  }
+  .tier-bottom{
+    width: 190px; height: 70px;
+    background: linear-gradient(180deg, #e9b8c4, #c26f85);
+    margin-top: -6px;
+  }
+  .icing{
+    position:absolute; top:-9px; left:-4px; right:-4px; height: 16px;
+    background: #fbf3e3;
+    border-radius: 40% 40% 4px 4px / 80% 80% 4px 4px;
+  }
+  .drip{
+    position:absolute; bottom:-6px; left:0; right:0; height: 12px;
+    background:
+      radial-gradient(circle at 8% 0, #fbf3e3 5px, transparent 6px),
+      radial-gradient(circle at 24% 0, #fbf3e3 6px, transparent 7px),
+      radial-gradient(circle at 42% 0, #fbf3e3 4px, transparent 5px),
+      radial-gradient(circle at 60% 0, #fbf3e3 6px, transparent 7px),
+      radial-gradient(circle at 78% 0, #fbf3e3 5px, transparent 6px),
+      radial-gradient(circle at 94% 0, #fbf3e3 4px, transparent 5px);
+  }
+  .sprinkles{ position:absolute; inset:0; }
+  .sprinkles i{
+    position:absolute; width:4px; height:9px; border-radius:2px;
+    transform: rotate(var(--r));
+  }
+  .band{ position:absolute; bottom:14px; left:0; right:0; height:6px; background: rgba(255,255,255,.55); }
+
+  .plate{
+    width: 220px; height: 12px; margin: 0 auto;
+    background: linear-gradient(180deg, rgba(207,159,78,.5), rgba(207,159,78,.15));
+    border-radius: 50%;
+    filter: blur(.4px);
+  }
+
+  .instruction{
+    font-size: 12.5px;
+    color: var(--cream-dim);
+    letter-spacing:.03em;
+    margin-bottom: 22px;
+    min-height: 18px;
+  }
+
+  .blow-btn{
+    padding: 13px 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(227,192,127,0.6);
+    color: var(--gold-soft);
+    font-size: 13px;
+    letter-spacing:.1em;
+    background: rgba(255,255,255,0.04);
+    transition: background .2s ease, transform .2s ease;
+    animation: btnGlow 2.2s ease-in-out infinite;
+  }
+  @keyframes btnGlow{ 0%,100%{ box-shadow: 0 0 0 0 rgba(227,192,127,0);} 50%{ box-shadow: 0 0 0 8px rgba(227,192,127,0.1);} }
+  .blow-btn:hover{ background: rgba(227,192,127,0.15); transform: translateY(-2px); }
+  .blow-btn:disabled{ opacity:.4; animation:none; }
+
+  .count-num{
+    font-family:'Playfair Display', serif;
+    font-size: 60px;
+    color: var(--gold-soft);
+    height: 70px;
+    animation: countPop .6s ease;
+  }
+  @keyframes countPop{ from{ transform: scale(.5); opacity:0;} to{ transform: scale(1); opacity:1;} }
+
+  .finale{ display:none; }
+  .finale.show{ display:block; animation: revealUp .9s ease; }
+  @keyframes revealUp{ from{ opacity:0; transform: translateY(20px);} to{ opacity:1; transform:none; } }
+  .finale-heart{ font-size: 40px; margin-bottom: 14px; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.15);} }
+  .finale-title{
+    font-family:'Dancing Script', cursive;
+    font-size: 42px;
+    color: #fbeee0;
+    background: linear-gradient(100deg, #fbeee0 20%, var(--gold-soft) 45%, #fbeee0 70%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent;
+    animation: shimmer 4.5s linear infinite;
+  }
+  @keyframes shimmer{ to{ background-position: -220% 0; } }
+  .finale-sub{
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.85;
+    color: var(--cream-dim);
+    max-width: 380px;
+  }
+
+  .gallery{ margin-top: 30px; max-width: 380px; margin-left:auto; margin-right:auto; }
+  .gallery-frame{
+    width: min(380px, 82vw);
+    height: 460px;
+    margin: 0 auto 16px;
+    border-radius: 6px;
+    overflow:hidden;
+    box-shadow: 0 20px 45px var(--shadow);
+    border: 4px solid var(--cream);
+    position: relative;
+  }
+  .gallery-frame img{
+    width:100%; height:100%; object-fit:cover;
+    display:block;
+    animation: photoIn .5s ease;
+  }
+  @keyframes photoIn{ from{ opacity:0; transform: scale(1.08) rotate(1deg);} to{ opacity:1; transform:none; } }
+  .gallery-caption{
+    font-family:'Dancing Script', cursive;
+    font-size: 17px;
+    color: var(--gold-soft);
+    margin-bottom: 14px;
+  }
+  .gallery-dots{ display:flex; gap:8px; justify-content:center; margin-bottom: 16px; }
+  .gallery-dots span{ width:6px; height:6px; border-radius:50%; background: rgba(246,239,223,.3); transition: background .2s ease, transform .2s ease; }
+  .gallery-dots span.active{ background: var(--gold-soft); transform: scale(1.3); }
+  .gallery-btn{
+    padding: 11px 26px;
+    border-radius: 999px;
+    border: 1px solid rgba(227,192,127,0.6);
+    color: var(--gold-soft);
+    font-size: 12px;
+    letter-spacing:.08em;
+    background: rgba(255,255,255,0.04);
+    transition: transform .2s ease, background .2s ease;
+  }
+  .gallery-btn:hover{ background: rgba(227,192,127,0.15); transform: translateY(-2px); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="sparkles" id="sparkles"></div>
+
+  <div class="wish-stage fade-in" id="wishStage">
+    <div class="wish-title">Make a Wish</div>
+
+    <div class="cake-scene">
+      <div>
+        <div class="num-candle" id="numCandle">
+          <div class="num-flame" id="flame"></div>
+          <span id="candleYear">17</span>
+        </div>
+
+        <div class="cake">
+          <div class="tier tier-top">
+            <div class="icing"></div>
+            <div class="drip"></div>
+            <div class="sprinkles" id="sprinklesTop"></div>
+          </div>
+          <div class="tier tier-bottom">
+            <div class="icing"></div>
+            <div class="drip"></div>
+            <div class="band"></div>
+            <div class="sprinkles" id="sprinklesBottom"></div>
+          </div>
+        </div>
+        <div class="plate"></div>
+      </div>
+    </div>
+
+    <div class="instruction" id="instruction">tap below, then blow out the candle</div>
+    <div class="count-num" id="countNum" style="display:none;"></div>
+    <button class="blow-btn" id="blowBtn">🕯 blow the candle</button>
+  </div>
+
+  <div class="finale" id="finale">
+    <div class="finale-heart">💛</div>
+    <div class="finale-title" id="finalMsg">Happy Birthday!</div>
+    <div class="finale-sub" id="finalSub"></div>
+
+    <div class="gallery" id="gallery">
+      <div class="gallery-frame"><img id="galleryImg" src="" alt=""></div>
+      <div class="gallery-caption" id="galleryCaption"></div>
+      <div class="gallery-dots" id="galleryDots"></div>
+      <button class="gallery-btn" id="galleryBtn">📷 tap for the next memory</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  document.getElementById("candleYear").textContent = SURPRISE_CONFIG.wishCakeYear;
+  scatterSparkles(document.getElementById("sparkles"), 20);
+
+  // sprinkles
+  function addSprinkles(container, count){
+    const colors = ["#cf9f4e","#e3c07f","#f6efdf","#8f2030"];
+    for (let i=0;i<count;i++){
+      const s = document.createElement("i");
+      s.style.left = (5 + Math.random()*90) + "%";
+      s.style.top = (10 + Math.random()*70) + "%";
+      s.style.setProperty("--r", (Math.random()*360)+"deg");
+      s.style.background = colors[Math.floor(Math.random()*colors.length)];
+      container.appendChild(s);
+    }
+  }
+  addSprinkles(document.getElementById("sprinklesTop"), 8);
+  addSprinkles(document.getElementById("sprinklesBottom"), 12);
+
+  const blowBtn = document.getElementById("blowBtn");
+  const instruction = document.getElementById("instruction");
+  const countNum = document.getElementById("countNum");
+  const flame = document.getElementById("flame");
+  const wishStage = document.getElementById("wishStage");
+  const finale = document.getElementById("finale");
+
+  blowBtn.addEventListener("click", () => {
+    blowBtn.disabled = true;
+    instruction.style.display = "none";
+    countNum.style.display = "block";
+
+    let n = 3;
+    countNum.textContent = n;
+    const countTimer = setInterval(() => {
+      n -= 1;
+      if (n > 0) {
+        countNum.textContent = n;
+      } else {
+        clearInterval(countTimer);
+        countNum.textContent = "🎐";
+        flame.classList.add("out");
+
+        setTimeout(() => {
+          wishStage.style.transition = "opacity .5s ease";
+          wishStage.style.opacity = "0";
+          fireConfetti(3400);
+          setTimeout(() => {
+            wishStage.style.display = "none";
+            finale.classList.add("show");
+            document.getElementById("finalMsg").textContent = SURPRISE_CONFIG.finalMessage;
+            document.getElementById("finalSub").textContent = SURPRISE_CONFIG.finalSubmessage;
+            setupGallery();
+          }, 500);
+        }, 500);
+      }
+    }, 800);
+  });
+
+  // ---------- Photo gallery: tap cycles 1 -> 2 -> 3 -> 1 ----------
+  function setupGallery(){
+    const photos = SURPRISE_CONFIG.photos;
+    const img = document.getElementById("galleryImg");
+    const caption = document.getElementById("galleryCaption");
+    const dotsWrap = document.getElementById("galleryDots");
+    const btn = document.getElementById("galleryBtn");
+
+    photos.forEach(() => {
+      const d = document.createElement("span");
+      dotsWrap.appendChild(d);
+    });
+    const dots = [...dotsWrap.children];
+
+    let index = 0;
+    function render(){
+      img.src = photos[index].url;
+      img.alt = photos[index].caption;
+      img.style.animation = "none";
+      void img.offsetWidth;
+      img.style.animation = "photoIn .5s ease";
+      caption.textContent = photos[index].caption;
+      dots.forEach((d,i) => d.classList.toggle("active", i === index));
+    }
+    render();
+
+    btn.addEventListener("click", () => {
+      index = (index + 1) % photos.length; // 1 -> 2 -> 3 -> back to 1
+      render();
+    });
+  }
+</script>
+</body>
+</html>

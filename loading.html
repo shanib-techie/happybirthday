@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Loading your surprise…</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+  .loading-card{
+    text-align:center;
+    position:relative;
+    z-index:2;
+  }
+  .cake-emoji{
+    font-size: 46px;
+    margin: 6px 0 18px;
+    display:inline-block;
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-8px); } }
+  .greet{
+    font-family:'Dancing Script', cursive;
+    font-size: 34px;
+    color: var(--gold-soft);
+    margin-bottom: 4px;
+  }
+  .loading-label{
+    font-size: 13px;
+    letter-spacing:.06em;
+    color: var(--cream-dim);
+    margin-bottom: 16px;
+  }
+  .bar-track{
+    width: min(280px, 70vw);
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(246,239,223,0.15);
+    overflow:hidden;
+    margin: 0 auto;
+    border: 1px solid rgba(207,159,78,0.35);
+  }
+  .bar-fill{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+    transition: width .15s linear;
+  }
+  .bar-pct{
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--gold-soft);
+    letter-spacing: .08em;
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="sparkles" id="sparkles"></div>
+    <div class="loading-card fade-in">
+      <div class="greet">Hey gurl!</div>
+      <div class="cake-emoji">🎂</div>
+      <div class="loading-label">Loading your birthday surprise…</div>
+      <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+      <div class="bar-pct" id="barPct">0%</div>
+    </div>
+  </div>
+
+<script src="script.js"></script>
+<script>
+  scatterSparkles(document.getElementById("sparkles"), 20);
+
+  // where to go once loading finishes — pass ?next=envelope.html in the link that opens this page
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get("next") || "index.html";
+
+  const fill = document.getElementById("barFill");
+  const pct = document.getElementById("barPct");
+  let progress = 0;
+
+  const timer = setInterval(() => {
+    // uneven increments feel more natural than a linear bar
+    progress += Math.random() * 14 + 4;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(timer);
+      setTimeout(() => { window.location.href = next; }, 350);
+    }
+    fill.style.width = progress + "%";
+    pct.textContent = Math.floor(progress) + "%";
+  }, 220);
+</script>
+</body>
+</html>
